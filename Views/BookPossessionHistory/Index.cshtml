@@ -1,0 +1,89 @@
+@model IEnumerable<LibraryAssistant.Models.BookPossessionHistory>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Books Possession History</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-controller="BookPossessionHistory" asp-action="Index" method="get">
+    <p>
+        Lend Date From: <input type="date" name="SearchLendFrom" />
+        To: <input type="date" name="SearchLendTo" />
+    </p>
+    <p>
+        Return Date From: <input type="date" name="SearchReturnFrom" />
+        To: <input type="date" name="SearchReturnTo" />
+    </p>
+    <p>
+        Title: <input type="text" name="SearchTitle" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Book
+            </th>
+            <th>
+                Customer
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LendDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ReturnDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AmountDue)
+            </th>
+            <th>
+                Overdue
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        var overdueText = "";
+        var daysOverdue = (DateTime.Now - item.ReturnDate).Days;
+        if (daysOverdue > 0 && !item.Returned) {
+          overdueText = "Book overdue " + daysOverdue + " days!";
+        } else if (item.Returned) {
+            overdueText = "Returned on time.";
+        }
+     
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Book.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Customer.FirstName) @Html.DisplayFor(modelItem => item.Customer.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LendDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ReturnDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AmountDue)
+            </td>
+            <td>
+                @overdueText
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
